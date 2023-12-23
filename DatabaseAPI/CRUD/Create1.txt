@@ -1,0 +1,47 @@
+<?php
+
+header("Access-Control-Allow-Origin: *");
+header("content-type:application/json");
+header("Access-Control-Allow-Methods: GET,POST,PUT,PATCH,DELETE,OPTIONS");
+header("Access-Control-Max-Age:600");
+header("Access-Control-Allow-Headers:Content-Type,Access-Control-Allow-Headers,Authorization");
+
+include_once '../config/database.php';
+include_once '../object/Student.php';
+
+$database = new Database();
+
+$db = $database->getConnection();
+
+$student = new Student($db);
+
+$content = file_get_contents("jsondata.json");
+
+
+$data = json_decode($content);
+
+
+
+
+if(!empty($data->name)&&!empty($data->age)&&!empty($data->email))
+{	
+
+	$student->name=$data->name;
+	$student->age=$data->age;
+	$student->email=$data->email;
+	$student->created=date('Y-m-d H:i:s');
+	
+if($student->insertRecord())
+{
+		echo json_encode(array("message"=>"student info was created"));
+}
+else
+{
+		echo json_encode(array("message"=>"unable to create student info"));
+}
+}
+else
+{
+		echo json_encode(array("message"=>"unable to insert new record, incomplete data"));
+}
+?>
